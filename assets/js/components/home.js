@@ -18,7 +18,7 @@ class Home extends React.Component {
             this.setState({
                 link:"http://localhost:8000"+this.state.items['hydra:view']['hydra:next'],                
                 event:e
-            })        
+            })     
 }
 
 async componentDidUpdate(prevProps, prevState) {
@@ -31,7 +31,7 @@ async componentDidUpdate(prevProps, prevState) {
 
 
     componentDidMount(){
-        this.handleFormSubmit();
+        this.handleFormSubmit();   
     }
 
     render(){
@@ -104,9 +104,18 @@ async componentDidUpdate(prevProps, prevState) {
             } catch (error) {
               
             }
+
+            //on ne desactive pas le bouton si c'est la dernière page
+            if(this.state.link === "http://localhost:8000"+this.state.items['hydra:view']['hydra:last'])
+            {
+                this.setState({
+                    buttonValue:'disabled'
+                }) 
+            }else{               
                 this.setState({
                     buttonValue:''
                 });
+            }
         }  
 //--------------------------------                
 
