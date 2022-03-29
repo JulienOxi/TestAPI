@@ -8,24 +8,29 @@ class Home extends React.Component {
         this.state = {
             items: [],
             dataIsLoaded: false,
-            link: "http://localhost:8000/api/comments",
+            linkNext: "http://localhost:8000/api/comments",
+            buttonNextValue:'',
+            linkPrev: null,
+            buttonPrevValue:'',
             event:null,
-            buttonValue:''
+
+            
         };
     }
 
     handleClick = (e) => {
             this.setState({
-                link:"http://localhost:8000"+this.state.items['hydra:view']['hydra:next'],                
+                linkNext:"http://localhost:8000"+this.state.items['hydra:view']['hydra:next'],
+                linkPrev:"http://localhost:8000"+this.state.items['hydra:view']['hydra:previous'],                
                 event:e
             })     
 }
 
 async componentDidUpdate(prevProps, prevState) {
 
-    if(prevState.link != this.state.link){
+    if((prevState.linkNext != this.state.linkNext) || (prevState.linkPrev != this.state.linkPrev)){
         this.handleFormSubmit(this.state.event);
-    }
+    }  
     return
 }
 
@@ -54,8 +59,9 @@ async componentDidUpdate(prevProps, prevState) {
                 </ol>
             ))
             }
-
-            <button onClick={this.handleClick} id="button" disabled={this.state.buttonValue} >Page suivante</button>
+            
+            <button onClick={this.handleClick} id="buttonPrev" disabled={this.state.buttonPrevValue} >Page Précédente</button>
+            <button onClick={this.handleClick} id="buttonNext" disabled={this.state.buttonNextValue} >Page suivante</button>
         </div>
         )
     }
@@ -84,36 +90,44 @@ async componentDidUpdate(prevProps, prevState) {
     //---------------------------------------
     async handleFormSubmit(event = null) {
             
+        let url = this.state.linkNext;
+
             if(event){
                 event.preventDefault();
                 this.setState({
-                    buttonValue:'disabled'
+                    buttonNextValue:'disabled',
+                    buttonPrevValue:'disabled'
                 })
+                //on regarde quel bouton à été cliquer next ou prev
+                if(event.target.id === "buttonPrev"){
+                    url = this.state.linkPrev;
+                }                
             }
-            
-            const url = this.state.link;
+
             try {
                 const responseData = await this.postFormDataAsJson({url});
 
-                  //mise à jour des données JSON
-                  this.setState({
+                //mise à jour des données JSON
+                this.setState({
                     items: responseData,
                     dataIsLoaded: true
                 });
 
             } catch (error) {
-              
-            }
+            
+            }            
 
             //on ne desactive pas le bouton si c'est la dernière page
-            if(this.state.link === "http://localhost:8000"+this.state.items['hydra:view']['hydra:last'])
+            if(this.state.linkNext === "http://localhost:8000"+this.state.items['hydra:view']['hydra:last'])
             {
                 this.setState({
-                    buttonValue:'disabled'
+                    buttonNextValue:'disabled',
+                    buttonPrevValue:''
                 }) 
             }else{               
                 this.setState({
-                    buttonValue:''
+                    buttonNextValue:'',
+                    buttonPrevValue:''
                 });
             }
         }  
