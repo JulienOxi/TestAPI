@@ -13,15 +13,14 @@ class Home extends React.Component {
             linkPrev: null,
             buttonPrevValue:'',
             event:null,
-
-            
+            server:"http://localhost:8000"
         };
     }
 
     handleClick = (e) => {
             this.setState({
-                linkNext:"http://localhost:8000"+this.state.items['hydra:view']['hydra:next'],
-                linkPrev:"http://localhost:8000"+this.state.items['hydra:view']['hydra:previous'],                
+                linkNext:this.state.server+this.state.items['hydra:view']['hydra:next'],
+                linkPrev:this.state.server+this.state.items['hydra:view']['hydra:previous'],                
                 event:e
             })     
 }
@@ -31,6 +30,28 @@ async componentDidUpdate(prevProps, prevState) {
     if((prevState.linkNext != this.state.linkNext) || (prevState.linkPrev != this.state.linkPrev)){
         this.handleFormSubmit(this.state.event);
     }  
+            //on ne desactive pas le bouton si c'est la dernière page
+            if(this.state.linkNext === this.state.server+this.state.items['hydra:view']['hydra:last'])
+            {
+                this.setState({
+                    buttonNextValue:'disabled',
+                }) 
+            }else{               
+                this.setState({
+                    buttonNextValue:'',
+                });
+            }
+            if(this.state.linkPrev === this.state.server+this.state.items['hydra:view']['hydra:first'])
+            {
+                this.setState({
+                    buttonPrevValue:'disabled',
+                }) 
+            }else{               
+                this.setState({
+                    buttonPrevValue:'',
+                });
+            }  
+                
     return
 }
 
@@ -114,22 +135,8 @@ async componentDidUpdate(prevProps, prevState) {
                 });
 
             } catch (error) {
-            
-            }            
-
-            //on ne desactive pas le bouton si c'est la dernière page
-            if(this.state.linkNext === "http://localhost:8000"+this.state.items['hydra:view']['hydra:last'])
-            {
-                this.setState({
-                    buttonNextValue:'disabled',
-                    buttonPrevValue:''
-                }) 
-            }else{               
-                this.setState({
-                    buttonNextValue:'',
-                    buttonPrevValue:''
-                });
-            }
+                alert('Une erreur est survenue : '+error);
+            }                      
         }  
 //--------------------------------                
 
